@@ -1,10 +1,12 @@
-import { Button } from "./components/ui/button";
+import CommonLayout from "./components/layout/CommonLayout";
+import { Outlet } from "react-router";
 
 function App() {
   return (
     <>
-      <h1>Tour management system</h1>
-      <Button>Click me</Button>
+      <CommonLayout>
+        <Outlet />
+      </CommonLayout>
     </>
   );
 }
