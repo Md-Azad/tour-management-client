@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   Form,
   FormControl,
@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Password from "./password";
+import { useLoginMutation } from "@/redux/features/auth/auth.api";
 
 const loginSchema = z.object({
   email: z.email({ error: "Must be a valid Email" }),
@@ -24,7 +25,9 @@ const loginSchema = z.object({
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"form">) {
+}: React.ComponentProps<"div">) {
+  const navigate = useNavigate();
+  const [login] = useLoginMutation();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -32,8 +35,21 @@ export function LoginForm({
       password: "",
     },
   });
-  const onSubmit = (data: z.infer<typeof loginSchema>) => {
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+    const loginInfo = {
+      email: data.email,
+      password: data.password,
+    };
+
+    try {
+      const result = await login(loginInfo);
+      console.log(result);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.status === 401) {
+        navigate("/verify");
+      }
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

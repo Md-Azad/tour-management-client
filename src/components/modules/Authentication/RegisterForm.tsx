@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Password from "@/components/ui/password";
 import { useRegisterMutation } from "@/redux/features/auth/auth.api";
@@ -38,6 +38,7 @@ const RegisterForm = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
+  const navigate = useNavigate();
   const [register] = useRegisterMutation();
   const form = useForm<z.infer<typeof registationSchema>>({
     resolver: zodResolver(registationSchema),
@@ -60,6 +61,7 @@ const RegisterForm = ({
     try {
       const result = await register(userInfo).unwrap();
       console.log(result);
+      navigate("/verify");
     } catch (error) {
       console.log(error);
     }
