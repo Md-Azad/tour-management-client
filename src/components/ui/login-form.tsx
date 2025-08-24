@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { useForm } from "react-hook-form";
+import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Password from "./password";
@@ -35,17 +35,13 @@ export function LoginForm({
       password: "",
     },
   });
-  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
-    const loginInfo = {
-      email: data.email,
-      password: data.password,
-    };
-
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const result = await login(loginInfo);
-      console.log(result);
+      const result = await login(data).unwrap();
+      console.log(result, "result");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      console.log(error, "error");
       if (error.status === 401) {
         navigate("/verify");
       }

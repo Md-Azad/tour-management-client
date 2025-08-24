@@ -57,7 +57,7 @@ const RegisterForm = ({
       email: data.email,
       password: data.password,
     };
-    console.log(userInfo);
+    console.log("user data", userInfo);
     try {
       const result = await register(userInfo).unwrap();
       console.log(result);
