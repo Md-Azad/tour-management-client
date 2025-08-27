@@ -43,7 +43,7 @@ export function LoginForm({
     } catch (error: any) {
       console.log(error, "error");
       if (error.status === 401) {
-        navigate("/verify");
+        navigate("/verify", { state: data.email });
       }
     }
   };

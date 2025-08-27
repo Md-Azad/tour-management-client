@@ -61,7 +61,7 @@ const RegisterForm = ({
     try {
       const result = await register(userInfo).unwrap();
       console.log(result);
-      navigate("/verify");
+      navigate("/verify", { state: data.email });
     } catch (error) {
       console.log(error);
     }
