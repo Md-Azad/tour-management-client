@@ -33,7 +33,10 @@ const FormSchema = z.object({
 
 import { useState } from "react";
 import { useLocation } from "react-router";
-import { useSendOTPMutation } from "@/redux/features/auth/auth.api";
+import {
+  useSendOTPMutation,
+  useVerifyOTPMutation,
+} from "@/redux/features/auth/auth.api";
 import { toast } from "sonner";
 
 const Verify = () => {
@@ -50,6 +53,7 @@ const Verify = () => {
   const [email] = useState(location.state);
   const [confirmed, setConfirmed] = useState(false);
   const [sendOTP] = useSendOTPMutation();
+  const [verifyOTP] = useVerifyOTPMutation();
 
   //   useEffect(() => {
   //     if (!email) {
@@ -61,7 +65,7 @@ const Verify = () => {
     const toastId = toast.loading("sending OTP");
     try {
       const res = await sendOTP({ email: email }).unwrap();
-      console.log(res);
+
       if (res.success) {
         toast.success("OTP sent", { id: toastId });
         setConfirmed(true);
@@ -70,8 +74,19 @@ const Verify = () => {
       console.log(error);
     }
   };
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const toastId = toast.loading("Verifing OTP");
+    const otpInfo = {
+      email,
+      otp: data.pin,
+    };
+    console.log(otpInfo);
+
+    const res = await verifyOTP(otpInfo).unwrap();
+
+    if (res.success) {
+      toast.success("OTP Verified", { id: toastId });
+    }
   };
   return (
     <div className="grid place-content-center h-screen">
