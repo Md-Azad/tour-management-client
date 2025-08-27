@@ -1,19 +1,120 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Dot } from "lucide-react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+
+const FormSchema = z.object({
+  pin: z.string().min(6, {
+    message: "Your one-time password must be 6 characters.",
+  }),
+});
+
+// import { useEffect, useState } from "react";
+// import { useLocation, useNavigate } from "react-router";
 
 const Verify = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [email] = useState(location.state);
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      pin: "",
+    },
+  });
 
-  useEffect(() => {
-    if (!email) {
-      navigate("/");
-    }
-  }, [email, navigate]);
+  //   const form = useForm();
+  //   const location = useLocation();
+  //   const navigate = useNavigate();
+  //   const [email] = useState(location.state);
+
+  //   useEffect(() => {
+  //     if (!email) {
+  //       navigate("/");
+  //     }
+  //   }, [email, navigate]);
+
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    console.log(data);
+  };
   return (
-    <div>
-      <h1>Verify component</h1>
+    <div className="grid place-content-center h-screen">
+      <Card className="w-full ">
+        <CardHeader>
+          <CardTitle>Verify your email address</CardTitle>
+          <CardDescription>
+            Please enter your 6 digit code that we sent.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              id="otp-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className=" space-y-6"
+            >
+              <FormField
+                control={form.control}
+                name="pin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>One-Time Password</FormLabel>
+                    <FormControl>
+                      <InputOTP maxLength={6} {...field}>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                        </InputOTPGroup>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={1} />
+                        </InputOTPGroup>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={2} />
+                        </InputOTPGroup>
+                        <Dot />
+                        <InputOTPGroup>
+                          <InputOTPSlot index={3} />
+                        </InputOTPGroup>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={4} />
+                        </InputOTPGroup>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex-col gap-2">
+          <Button form="otp-form" type="submit" className="w-full">
+            Submit
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
