@@ -31,8 +31,8 @@ const FormSchema = z.object({
   }),
 });
 
-// import { useEffect, useState } from "react";
-// import { useLocation, useNavigate } from "react-router";
+import { useState } from "react";
+import { useLocation } from "react-router";
 
 const Verify = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -43,9 +43,10 @@ const Verify = () => {
   });
 
   //   const form = useForm();
-  //   const location = useLocation();
+  const location = useLocation();
   //   const navigate = useNavigate();
-  //   const [email] = useState(location.state);
+  const [email] = useState(location.state);
+  const [confirmed, setConfirmed] = useState(false);
 
   //   useEffect(() => {
   //     if (!email) {
@@ -53,68 +54,86 @@ const Verify = () => {
   //     }
   //   }, [email, navigate]);
 
+  const handleConfirm = () => {
+    setConfirmed(true);
+  };
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     console.log(data);
   };
   return (
     <div className="grid place-content-center h-screen">
-      <Card className="w-full ">
-        <CardHeader>
-          <CardTitle>Verify your email address</CardTitle>
-          <CardDescription>
-            Please enter your 6 digit code that we sent.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              id="otp-form"
-              onSubmit={form.handleSubmit(onSubmit)}
-              className=" space-y-6"
-            >
-              <FormField
-                control={form.control}
-                name="pin"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>One-Time Password</FormLabel>
-                    <FormControl>
-                      <InputOTP maxLength={6} {...field}>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                        </InputOTPGroup>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={1} />
-                        </InputOTPGroup>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={2} />
-                        </InputOTPGroup>
-                        <Dot />
-                        <InputOTPGroup>
-                          <InputOTPSlot index={3} />
-                        </InputOTPGroup>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={4} />
-                        </InputOTPGroup>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </FormControl>
+      {confirmed ? (
+        <Card className="w-full ">
+          <CardHeader>
+            <CardTitle>Verify your email address</CardTitle>
+            <CardDescription>
+              Please enter your 6 digit code that we sent.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                id="otp-form"
+                onSubmit={form.handleSubmit(onSubmit)}
+                className=" space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="pin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>One-Time Password</FormLabel>
+                      <FormControl>
+                        <InputOTP maxLength={6} {...field}>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                          </InputOTPGroup>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={1} />
+                          </InputOTPGroup>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={2} />
+                          </InputOTPGroup>
+                          <Dot />
+                          <InputOTPGroup>
+                            <InputOTPSlot index={3} />
+                          </InputOTPGroup>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={4} />
+                          </InputOTPGroup>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button form="otp-form" type="submit" className="w-full">
-            Submit
-          </Button>
-        </CardFooter>
-      </Card>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex-col gap-2">
+            <Button form="otp-form" type="submit" className="w-full">
+              Submit
+            </Button>
+          </CardFooter>
+        </Card>
+      ) : (
+        <Card className="w-full ">
+          <CardHeader className="w-[400px]">
+            <CardTitle>Verify your email address</CardTitle>
+            <CardDescription>We will send your code at {email}</CardDescription>
+          </CardHeader>
+
+          <CardFooter className="flex-col gap-2">
+            <Button onClick={handleConfirm} className="w-[300px]">
+              Confirm
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
 };
