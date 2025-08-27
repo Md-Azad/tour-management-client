@@ -33,6 +33,8 @@ const FormSchema = z.object({
 
 import { useState } from "react";
 import { useLocation } from "react-router";
+import { useSendOTPMutation } from "@/redux/features/auth/auth.api";
+import { toast } from "sonner";
 
 const Verify = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -47,6 +49,7 @@ const Verify = () => {
   //   const navigate = useNavigate();
   const [email] = useState(location.state);
   const [confirmed, setConfirmed] = useState(false);
+  const [sendOTP] = useSendOTPMutation();
 
   //   useEffect(() => {
   //     if (!email) {
@@ -54,8 +57,18 @@ const Verify = () => {
   //     }
   //   }, [email, navigate]);
 
-  const handleConfirm = () => {
-    setConfirmed(true);
+  const handleConfirm = async () => {
+    const toastId = toast.loading("sending OTP");
+    try {
+      const res = await sendOTP({ email: email }).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success("OTP sent", { id: toastId });
+        setConfirmed(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     console.log(data);
