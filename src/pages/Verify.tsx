@@ -80,7 +80,6 @@ const Verify = () => {
       email,
       otp: data.pin,
     };
-    console.log(otpInfo);
 
     const res = await verifyOTP(otpInfo).unwrap();
 

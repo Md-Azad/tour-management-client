@@ -17,6 +17,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Password from "./password";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.email({ error: "Must be a valid Email" }),
@@ -42,7 +43,10 @@ export function LoginForm({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error, "error");
-      if (error.status === 401) {
+      if (error.data.message === "Password does not match") {
+        toast.error("invalid credentials");
+      }
+      if (error.data.message === "User is not verified") {
         navigate("/verify", { state: data.email });
       }
     }
