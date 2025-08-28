@@ -10,6 +10,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,7 +32,7 @@ const FormSchema = z.object({
   }),
 });
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import {
   useSendOTPMutation,
@@ -54,25 +55,53 @@ const Verify = () => {
   const [confirmed, setConfirmed] = useState(false);
   const [sendOTP] = useSendOTPMutation();
   const [verifyOTP] = useVerifyOTPMutation();
-
+  const [time, setTime] = useState(8);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   //   useEffect(() => {
   //     if (!email) {
   //       navigate("/");
   //     }
   //   }, [email, navigate]);
 
-  const handleConfirm = async () => {
-    const toastId = toast.loading("sending OTP");
-    try {
-      const res = await sendOTP({ email: email }).unwrap();
-
-      if (res.success) {
-        toast.success("OTP sent", { id: toastId });
-        setConfirmed(true);
-      }
-    } catch (error) {
-      console.log(error);
+  useEffect(() => {
+    // Start timer only if confirmed and time > 0
+    if (confirmed && time > 0) {
+      intervalRef.current = setInterval(() => {
+        setTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(intervalRef.current!);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
+
+    // Cleanup on unmount or when time changes
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [confirmed, time]);
+
+  const handleConfirm = async () => {
+    setConfirmed(true);
+    setTime(8);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    // const toastId = toast.loading("sending OTP");
+    // try {
+    //   const res = await sendOTP({ email: email }).unwrap();
+
+    //   if (res.success) {
+    //     toast.success("OTP sent", { id: toastId });
+
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const toastId = toast.loading("Verifing OTP");
@@ -133,7 +162,16 @@ const Verify = () => {
                           </InputOTPGroup>
                         </InputOTP>
                       </FormControl>
-
+                      <FormDescription>
+                        <Button
+                          disabled={time > 0}
+                          type="button"
+                          onClick={handleConfirm}
+                        >
+                          Resend OTP
+                        </Button>
+                        {time}
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
