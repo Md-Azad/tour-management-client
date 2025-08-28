@@ -40,6 +40,8 @@ import {
 } from "@/redux/features/auth/auth.api";
 import { toast } from "sonner";
 
+import { cn } from "@/lib/utils";
+
 const Verify = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -86,22 +88,21 @@ const Verify = () => {
   }, [confirmed, time]);
 
   const handleConfirm = async () => {
-    setConfirmed(true);
-    setTime(8);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    const toastId = toast.loading("sending OTP");
+    try {
+      const res = await sendOTP({ email: email }).unwrap();
+
+      if (res.success) {
+        toast.success("OTP sent", { id: toastId });
+        setConfirmed(true);
+        setTime(8);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
-    // const toastId = toast.loading("sending OTP");
-    // try {
-    //   const res = await sendOTP({ email: email }).unwrap();
-
-    //   if (res.success) {
-    //     toast.success("OTP sent", { id: toastId });
-
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
   };
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const toastId = toast.loading("Verifing OTP");
@@ -165,8 +166,13 @@ const Verify = () => {
                       <FormDescription>
                         <Button
                           disabled={time > 0}
+                          variant="link"
                           type="button"
                           onClick={handleConfirm}
+                          className={cn("p-0 m-0", {
+                            "cursor-pointer": time === 0,
+                            "text-gray-600": time !== 0,
+                          })}
                         >
                           Resend OTP
                         </Button>

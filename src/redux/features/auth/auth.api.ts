@@ -26,7 +26,6 @@ const authApi = baseApi.injectEndpoints({
     }),
     verifyOTP: builder.mutation<IResponse<null>, IVerifyOTP>({
       query: (payload) => {
-        console.log(payload);
         return {
           url: "/otp/verify-otp",
           method: "POST",
